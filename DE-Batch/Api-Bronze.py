@@ -1,51 +1,19 @@
 # Databricks notebook source
-# MAGIC %md
-# MAGIC # Realtime Data Ingestion: OpenData Realtime Trip Data
-# MAGIC Current vehicle positions in GTFS-realtime format for Buses, Ferries, Light Rail and Trains is available from [opendata](https://opendata.transport.nsw.gov.au/dataset/public-transport-realtime-vehicle-positions-v2). Using an API key activated in the website, we pull create a near-realtime streaming job, polling the API every 60 seconds for Train Locations.
-# MAGIC
-# MAGIC **Author:** Lisa Sherin lisa.sherin@databricks.com
+# MAGIC %pip install protobuf
 
 # COMMAND ----------
 
-# MAGIC %md 
-# MAGIC ## Initial Set-up Notes for Protobuf
-# MAGIC
-# MAGIC The python module is already available in the repo, this section is just for reference if the protobuf is updated.
-# MAGIC
-# MAGIC ### Pip Install Requirements
-# MAGIC ```pip install protobuf```
-# MAGIC
-# MAGIC ### Bash Script to generate python module
-# MAGIC ```
-# MAGIC %sh 
-# MAGIC
-# MAGIC apt install -y protobuf-compiler
-# MAGIC
-# MAGIC protoc -I=. --python_out=. gtfs-realtime_1007_extension.proto_
-# MAGIC ```
+current_user_id = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+datasets_location = f'/FileStore/tmp/{current_user_id}/datasets/'
 
-# COMMAND ----------
+dbutils.fs.rm(datasets_location, True)
+catalog_name = "transport_bootcamp"
+spark.sql(f'CREATE CATALOG IF NOT EXISTS {catalog_name}')
+database_name = current_user_id.split('@')[0].replace('.','_')+'_bootcamp'
+spark.sql(f'create database if not exists {catalog_name}.{database_name};')
+spark.sql(f'use {catalog_name}.{database_name}')
 
-# MAGIC %sh
-# MAGIC pip install protobuf
-# MAGIC
-# MAGIC apt install -y protobuf-compiler protoc -I=. --python_out=. gtfs-realtime_1007_extension.proto_
-
-# COMMAND ----------
-
-# create widgets to parameterise the notebook
-dbutils.widgets.text('target_catalog', 'INSERT_HERE', label='target_catalog')
-dbutils.widgets.text('target_schema', 'INSERT_HERE', label='target_schema')
-dbutils.widgets.text('target_table', 'INSERT_HERE', label='target_table')
-dbutils.widgets.text('api_url', 'INSERT_HERE', label='api_url')
-
-# COMMAND ----------
-
-# retrieve variables passed to the notebook
-target_catalog = dbutils.widgets.get('target_catalog')
-target_schema = dbutils.widgets.get('target_schema')
-target_table = dbutils.widgets.get('target_table')
-api_url = dbutils.widgets.get('api_url')
+print (f"Created database :  {catalog_name}.{database_name}") 
 
 # COMMAND ----------
 
@@ -71,6 +39,7 @@ def get_sydney_trains_data():
         # Retrieve the data from the response
         data = response.content
 
+        return data
         # Create a GTFS Realtime FeedMessage object
         feed = pb.FeedMessage()
 
@@ -161,18 +130,30 @@ def get_sydney_trains_data():
 
 # COMMAND ----------
 
-data = get_sydney_trains_data()
-display(data)
+ data = get_sydney_trains_data()
 
 # COMMAND ----------
 
 import time
+from datetime import datetime
+sleep_time = 10
 
-sleep_time = 60
+# while True:
+# for i in range(0,10) 
+api_data = get_sydney_trains_data()
+data = [{
+  "source": "api_transport_nsw",
+  "timestamp": datetime.utcnow(),
+  "data": api_data,
+}]
+df = spark.createDataFrame(data=data)
+df.write.mode('append').option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{database_name}.bronze_train_data")
+print(f"Sleeping for {sleep_time} seconds")
+  # time.sleep(sleep_time)
 
-while True: 
-  data = get_sydney_trains_data()
-  data.write.mode('append').option("mergeSchema", "true").saveAsTable("lisa_sherin_dac_demo_catalog.ref_timetables.realtime_tripfeed")
-  print(f"Sleeping for {sleep_time} seconds")
-  time.sleep(sleep_time)
 
+# COMMAND ----------
+
+# MAGIC %sql 
+# MAGIC
+# MAGIC select * from transport_bootcamp.yas_mokri_bootcamp.bronze_train_data
