@@ -29,7 +29,7 @@
 # MAGIC %sh
 # MAGIC pip install protobuf
 # MAGIC
-# MAGIC apt install -y protobuf-compiler protoc -I=. --python_out=. gtfs-realtime_1007_extension.proto_
+# MAGIC
 
 # COMMAND ----------
 
