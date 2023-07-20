@@ -26,6 +26,13 @@
 
 # COMMAND ----------
 
+# MAGIC %sh
+# MAGIC pip install protobuf
+# MAGIC
+# MAGIC
+
+# COMMAND ----------
+
 # create widgets to parameterise the notebook
 dbutils.widgets.text('target_catalog', 'INSERT_HERE', label='target_catalog')
 dbutils.widgets.text('target_schema', 'INSERT_HERE', label='target_schema')
@@ -154,6 +161,11 @@ def get_sydney_trains_data():
 
 # COMMAND ----------
 
+data = get_sydney_trains_data()
+display(data)
+
+# COMMAND ----------
+
 import time
 
 sleep_time = 60
@@ -163,8 +175,4 @@ while True:
   data.write.mode('append').option("mergeSchema", "true").saveAsTable("lisa_sherin_dac_demo_catalog.ref_timetables.realtime_tripfeed")
   print(f"Sleeping for {sleep_time} seconds")
   time.sleep(sleep_time)
-
-
-# COMMAND ----------
-
 
