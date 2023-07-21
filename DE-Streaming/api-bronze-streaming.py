@@ -8,6 +8,10 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../utils/refresh-env
+
+# COMMAND ----------
+
 import time
 import requests
 from datetime import datetime
@@ -43,18 +47,17 @@ def get_sydney_trains_data():
 sleep_time = 10
 
 # while True:
-# for i in range(0,2) 
-api_data = get_sydney_trains_data()
-data = [{
-  "source": "api_transport_nsw",
-  "timestamp": datetime.strftime(datetime.utcnow(), "%Y-%m-%dT%H:%M:%S"),
-  "data": api_data,
-}]
+for i in range(0,10) 
+  api_data = get_sydney_trains_data()
+  data = [{
+    "source": "api_transport_nsw",
+    "timestamp": datetime.strftime(datetime.utcnow(), "%Y-%m-%dT%H:%M:%S"),
+    "data": api_data,
+  }]
 
-df = spark.createDataFrame(data=data)
+  df = spark.createDataFrame(data=data)
 
-##write the data into cloud file storage as parquet
-## df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_name)
-df.write.mode('append').parquet(f"{datasets_location}/apidata/")
-time.sleep(sleep_time)
+  #write the data into a delta table (delta is the defaul format)
+  df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_name)
+  time.sleep(sleep_time)
 

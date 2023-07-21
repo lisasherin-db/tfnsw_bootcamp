@@ -1,6 +1,6 @@
 # Databricks notebook source
 current_user_id = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-datasets_location = f'/FileStore/tmp/{current_user_id}/datasets/'
+datasets_location = f'/FileStore/tmp/{current_user_id}/'
 
 catalog_name = "transport_bootcamp"
 database_name = current_user_id.split('@')[0].replace('.','_')+'_bootcamp'

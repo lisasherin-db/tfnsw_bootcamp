@@ -1,12 +1,6 @@
 # Databricks notebook source
-silver_table_name = "silver_train_data"
-checkpoint_location = f"/tmp/{silver_table_name}"
-
-# COMMAND ----------
-
-catalog_name = "transport_bootcamp"
-current_user_id = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-database_name = current_user_id.split('@')[0].replace('.','_')+'_bootcamp'
+# silver_table_name = "silver_train_data"
+checkpoint_location = f"{datasets_location}/{silver_table_name}"
 
 # COMMAND ----------
 
