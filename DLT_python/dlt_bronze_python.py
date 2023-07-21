@@ -1,6 +1,6 @@
 # Databricks notebook source
-# import sys, os
-# sys.path.append(os.path.abspath('/Workspace/Repos/yas.mokri@databricks.com/tfnsw_bootcamp/'))
+import sys, os
+sys.path.append(os.path.abspath('/Repos/yas.mokri@databricks.com/tfnsw_bootcamp/'))
 
 import dlt
 from pyspark.sql.protobuf.functions import from_protobuf
@@ -27,8 +27,9 @@ def bronze_view(temporary=True):
 
   df_bronze = dlt.read_stream("dlt_bronze")
 
-  #descriptor_file = "/Workspace/Repos/yas.mokri@databricks.com/tfnsw_bootcamp/gtfs_realtime_1007_extension.desc"
+  # descriptor_file = "/Repos/yas.mokri@databricks.com/tfnsw_bootcamp/gtfs_realtime_1007_extension.desc"
   descriptor_file = "/dbfs/FileStore/tmp/yas.mokri@databricks.com/gtfs.desc"
+  
   
   proto_df = df_bronze.select(col("timestamp").alias("ingest_time") , from_protobuf(df_bronze.data, "FeedMessage", descFilePath=descriptor_file).alias("proto"))
 
