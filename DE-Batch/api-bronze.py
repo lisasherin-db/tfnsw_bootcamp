@@ -72,6 +72,9 @@ df.write.mode('append').option("mergeSchema", "true").saveAsTable(f"{catalog_nam
 
 # MAGIC %md 
 # MAGIC let's write some code to explore api_data and the delta table 
+# MAGIC - in python you can use display()
+# MAGIC - you can switch to SQL by adding %sql 
+# MAGIC - to read a delta table into a dataframe you can use this syntax: spark.read.table(table_name)
 
 # COMMAND ----------
 
