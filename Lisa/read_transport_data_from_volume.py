@@ -72,7 +72,3 @@ for file in file_list:
 
 for table in list(_sqldf.select('tableName').collect()):
   spark.sql(f"DROP TABLE {table.tableName}")
-
-# COMMAND ----------
-
-
