@@ -1,11 +1,20 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC ## SETUP
+
+# COMMAND ----------
+
 current_user_id = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
 datasets_location = f'/FileStore/tmp/{current_user_id}/datasets/'
 
-dbutils.fs.rm(datasets_location, True)
 catalog_name = "transport_bootcamp"
-spark.sql(f'CREATE CATALOG IF NOT EXISTS {catalog_name}')
 database_name = current_user_id.split('@')[0].replace('.','_')+'_bootcamp'
+
+
+dbutils.fs.rm(datasets_location, True)
+
+
+spark.sql(f'CREATE CATALOG IF NOT EXISTS {catalog_name}')
 spark.sql(f'create database if not exists {catalog_name}.{database_name};')
 spark.sql(f'use {catalog_name}.{database_name}')
 
@@ -13,7 +22,11 @@ print (f"Created database :  {catalog_name}.{database_name}")
 
 # COMMAND ----------
 
-import requests
+import time
+import request
+from datetime import datetime
+
+# COMMAND ----------
 
 def get_sydney_trains_data():
     # API endpoint URL
@@ -29,7 +42,6 @@ def get_sydney_trains_data():
     response = requests.get(url, headers=headers)
 
     response.raise_for_status() # this will raise an exception if using dataflow we can retry the api call (needs some error handling)
-
  
     # # Check if the request was successful (status code 200)
     # if response.status_code == 200:
@@ -41,12 +53,6 @@ def get_sydney_trains_data():
 
 # COMMAND ----------
 
- data = get_sydney_trains_data()
-
-# COMMAND ----------
-
-import time
-from datetime import datetime
 sleep_time = 10
 
 # while True:
@@ -59,12 +65,24 @@ data = [{
 }]
 df = spark.createDataFrame(data=data)
 df.write.mode('append').option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{database_name}.bronze_train_data")
-print(f"Sleeping for {sleep_time} seconds")
-  # time.sleep(sleep_time)
+# time.sleep(sleep_time)
 
 
 # COMMAND ----------
 
+# MAGIC %md 
+# MAGIC let's write some code to explore api_data and the delta table 
+
+# COMMAND ----------
+
+display(api_data)
+display(df)
+
+# COMMAND ----------
+
+bronze_df = spark.read.table("transport_bootcamp.yas_mokri_bootcamp.bronze_train_data")
+
+# COMMAND ----------
+
 # MAGIC %sql 
-# MAGIC
 # MAGIC select * from transport_bootcamp.yas_mokri_bootcamp.bronze_train_data
