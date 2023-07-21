@@ -9,7 +9,6 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
-
 table = 'lisa_sherin_dac_demo_catalog.ref_timetables.realtime_tripfeed'
 
 df = spark.read.table(table)
@@ -85,8 +84,4 @@ map_4 = KeplerGl(height=600, config={'mapState': {'latitude': -33.85, 'longitude
 map_4.add_data(data=stations.select("generalname", "geom_wkt").toPandas(), name='stations')
 map_4.add_data(data = df_hex11_dense.select("latitude", "longitude", "trip_id", col("count").alias("mins_wait")).toPandas(), name = "hex11_dense_waits")
 display_kepler(map_4)
-
-
-# COMMAND ----------
-
 
