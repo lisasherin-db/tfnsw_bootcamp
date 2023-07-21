@@ -5,4 +5,4 @@ COMMENT "Bronze train table with all transactions"
 AS 
 SELECT * 
 FROM
-cloud_files( '/tmp/apidata/' , "parquet") 
+cloud_files( '${mypipeline.input_path}' , "parquet") 
