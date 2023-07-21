@@ -23,7 +23,7 @@ def bronze_table():
 # COMMAND ----------
 
 @dlt.view()
-def bronze_view():
+def bronze_view(temporary=True):
 
   df_bronze = dlt.read_stream("dlt_bronze")
 
@@ -54,3 +54,9 @@ def dlt_silver():
   unpacked_df = unpacked_df.select('ingest_time', "entity", "entity.*").select('ingest_time', "entity", "id", "alert","vehicle.*")
 
   return unpacked_df
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Let's do this in SQL (open the gold notebook from the repo with SQL as the language)
+# MAGIC
