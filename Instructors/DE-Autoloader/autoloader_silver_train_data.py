@@ -60,7 +60,7 @@ print(silver_table_name)
 # COMMAND ----------
 
 #unpacked_df.write.mode('append').option("mergeSchema", "true").saveAsTable(silver_table_name)
-checkpoint_location = f"{datasets_location}/checkpoints/{silver_table_name}"
+checkpoint_location = f"{datasets_location}checkpoints/{silver_table_name}"
 unpacked_df.writeStream.option("mergeSchema", "true").option("checkpointLocation", checkpoint_location).table(silver_table_name)
 
 # COMMAND ----------
@@ -70,4 +70,4 @@ display(spark.readStream.table(silver_table_name).where("id=1"))
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC select count(*) from transport_bootcamp.yas_mokri_bootcamp.silver_train_data
+# MAGIC select count(*) from $database.silver_train_data
