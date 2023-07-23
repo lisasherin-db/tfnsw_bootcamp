@@ -4,25 +4,11 @@
 
 # COMMAND ----------
 
-UC_enabled = False
-reset = True
-
-# COMMAND ----------
-
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
-dbutils.widgets.text('database', database)
-dbutils.widgets.text('bronze_table', bronze_table_name)
-dbutils.widgets.text('silver_table', silver_table_name)
-dbutils.widgets.text('gold_table', gold_table_name)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Start
-# MAGIC ##Make sure you ran SETUP first
+# MAGIC %run ../utils/refresh-env
 
 # COMMAND ----------
 
@@ -61,17 +47,17 @@ def get_sydney_trains_data():
 sleep_time = 10
 
 # while True:
-# for i in range(0,10) 
-api_data = get_sydney_trains_data()
-data = [{
-  "source": "api_transport_nsw",
-  "timestamp": datetime.strftime(datetime.utcnow(), "%Y-%m-%dT%H:%M:%S"),
-  "data": api_data,
-}]
+for i in range(0,10) 
+  api_data = get_sydney_trains_data()
+  data = [{
+    "source": "api_transport_nsw",
+    "timestamp": datetime.strftime(datetime.utcnow(), "%Y-%m-%dT%H:%M:%S"),
+    "data": api_data,
+  }]
 
-df = spark.createDataFrame(data=data)
+  df = spark.createDataFrame(data=data)
 
-#write the data into a delta table (delta is the defaul format)
-df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_name)
-# time.sleep(sleep_time)
+  #write the data into a delta table (delta is the defaul format)
+  df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_name)
+  time.sleep(sleep_time)
 
