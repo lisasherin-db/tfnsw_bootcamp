@@ -18,8 +18,8 @@
 
 # COMMAND ----------
 
-input_path = f"{datasets_location}/apidata/"
-schema_path = f"{datasets_location}/schema/"
+input_path = f"{datasets_location}apidata/"
+schema_path = f"{datasets_location}schema/"
 
 bronze_df = (
     spark.readStream.format("cloudFiles")
@@ -31,5 +31,9 @@ display(bronze_df)
 
 # COMMAND ----------
 
-checkpoint_location = f"{datasets_location}/checkpoints/{bronze_table_name}"
+checkpoint_location = f"{datasets_location}checkpoints/{bronze_table_name}"
 bronze_df.writeStream.option("mergeSchema", "true").option("checkpointLocation", checkpoint_location).table(bronze_table_name)
+
+# COMMAND ----------
+
+

@@ -45,7 +45,7 @@ def get_sydney_trains_data():
 # COMMAND ----------
 
 sleep_time = 10
-output_path = f"{datasets_location}/apidata/"
+output_path = f"{datasets_location}apidata/"
 
 # while True:
 # for i in range(0,2) 
@@ -62,4 +62,8 @@ df = spark.createDataFrame(data=data)
 ## df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_name)
 df.write.mode('append').parquet(output_path)
 time.sleep(sleep_time)
+
+
+# COMMAND ----------
+
 
