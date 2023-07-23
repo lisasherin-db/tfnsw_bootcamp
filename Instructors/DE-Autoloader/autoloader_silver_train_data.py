@@ -1,11 +1,28 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC ##SETUP
+
+# COMMAND ----------
+
+UC_enabled = False
+reset = False
+
+# COMMAND ----------
+
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
-print (f"database :  {database}") 
-print(f"bronze table name: {bronze_table_name}")
-print(f"silver table name: {silver_table_name}")
+dbutils.widgets.text('database', database)
+dbutils.widgets.text('bronze_table', bronze_table_name)
+dbutils.widgets.text('silver_table', silver_table_name)
+dbutils.widgets.text('gold_table', gold_table_name)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Start
+# MAGIC ##Make sure you ran SETUP first
 
 # COMMAND ----------
 
@@ -14,7 +31,7 @@ print(f"silver table name: {silver_table_name}")
 
 # COMMAND ----------
 
-# df_bronze = spark.read.table(bronze_table_name)
+#df_bronze = spark.read.table(bronze_table_name)
 df_bronze = spark.readStream.table(bronze_table_name)
 display(df_bronze)
 
@@ -41,11 +58,7 @@ display(proto_df)
 # COMMAND ----------
 
 unpacked_df = proto_df.select('ingest_time', 'proto.*').select('ingest_time', explode(col('entity')).alias("entity"))
-
-# hand on exercise- continue by unpacking some more fields like entity then vehicle, use a pattern similar proto_df.select('proto.*')
 unpacked_df = unpacked_df.select('ingest_time', "entity", "entity.*").select('ingest_time', "entity", "id", "alert","vehicle.*")
-
-display(unpacked_df)
 
 # COMMAND ----------
 
@@ -70,4 +83,4 @@ display(spark.readStream.table(silver_table_name).where("id=1"))
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC select count(*) from transport_bootcamp.yas_mokri_bootcamp.silver_train_data
+# MAGIC select count(*) from $silver_table

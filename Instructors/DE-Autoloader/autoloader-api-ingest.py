@@ -4,11 +4,12 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/setup
+UC_enabled = False
+reset = True
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/refresh-env
+# MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
@@ -61,5 +62,5 @@ df = spark.createDataFrame(data=data)
 ##write the data into cloud file storage as parquet
 ## df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_name)
 df.write.mode('append').parquet(output_path)
-time.sleep(sleep_time)
+# time.sleep(sleep_time)
 
