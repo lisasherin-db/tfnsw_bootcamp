@@ -29,7 +29,6 @@ reset = True
 
 # COMMAND ----------
 
-
 storage_location = f'{datasets_location}dlt_pipeline'
 pipline_name = f"{database_name}_train_data_pipeline"
 notebook_path = f"/Repos/{current_user_id}/tfnsw_bootcamp/Instructors/DLT_python/dlt_bronze_python"

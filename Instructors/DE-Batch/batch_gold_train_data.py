@@ -17,7 +17,6 @@ dbutils.widgets.removeAll()
 
 # COMMAND ----------
 
-
 dbutils.widgets.text('database', database)
 dbutils.widgets.text('bronze_table', bronze_table_name)
 dbutils.widgets.text('silver_table', silver_table_name)

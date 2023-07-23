@@ -41,7 +41,7 @@ if reset:
   if UC_enabled:
     spark.sql(f'CREATE CATALOG IF NOT EXISTS {catalog_name}')
 
-  spark.sql(f'drop database {database} cascade')
+  spark.sql(f'drop database IF  EXISTS {database} cascade')
   spark.sql(f'create database if not exists {database};')
   spark.sql(f'use {database}')
 
