@@ -20,6 +20,11 @@
 
 # COMMAND ----------
 
+UC_enabled = False
+reset = True
+
+# COMMAND ----------
+
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
@@ -27,18 +32,25 @@
 
 storage_location = f'{datasets_location}dlt_pipeline'
 pipline_name = f"{database_name}_train_data_pipeline"
-notebook_path = f"/Repos/{current_user_id}/tfnsw_bootcamp/DLT_python/dlt_bronze_python"
+notebook_path = f"/Repos/{current_user_id}/tfnsw_bootcamp/Instructors/DLT_python/dlt_bronze_python"
 input_path = f"{datasets_location}dlt_apidata/"
+cluster_mode = "Fixed size"
+workers = 2
 
 displayHTML("""<h2>Use these values to create your Delta Live Pipeline</h2>""")
-displayHTML("""<b>Noteook path: </b>""")
-displayHTML(f"""<b style="color:green">{notebook_path}</b>""")
 displayHTML("""<b>Pipeline name: </b>""")
 displayHTML(f"""<b style="color:green">{pipline_name}</b>""")
+displayHTML("""<b>Source code paths: </b>""")
+displayHTML(f"""<b style="color:green">{notebook_path}</b>""")
 displayHTML("""<b>Storage Location: </b>""")
 displayHTML("""<b style="color:green">{}</b>""".format(storage_location))
 displayHTML("""<b>Target Schema:</b>""")
 displayHTML("""<b style="color:green">{}</b>""".format(database_name))
+displayHTML("""<b>Cluster mode:</b>""")
+displayHTML("""<b style="color:green">{}</b>""".format(cluster_mode))
+displayHTML("""<b>Workers:</b>""")
+displayHTML("""<b style="color:green">{}</b>""".format(workers))
+
 displayHTML("""<b>Advanced -> Configuration:</b>""")
 displayHTML("""Key: <b style="color:green">mypipeline.input_path</b>""")
 displayHTML("""Value: <b style="color:green">{}</b>""".format(input_path))

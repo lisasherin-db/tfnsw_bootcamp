@@ -4,11 +4,12 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/setup
+UC_enabled = False
+reset = True
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/refresh-env
+# MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
@@ -63,3 +64,7 @@ df = spark.createDataFrame(data=data)
 df.write.mode('append').parquet(output_path)
 time.sleep(sleep_time)
 
+
+# COMMAND ----------
+
+dbutils.fs.ls('/FileStore/tmp/yas.mokri@databricks.com/dlt_apidata/')

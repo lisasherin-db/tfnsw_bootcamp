@@ -22,7 +22,11 @@ api_uri = 'https://api.transport.nsw.gov.au/v2/gtfs/vehiclepos/sydneytrains'
 
 # COMMAND ----------
 
-descriptor_file = "/Workspace/Repos/yas.mokri@databricks.com/tfnsw_bootcamp/gtfs-realtime_1007_extension.desc"
+source_descriptor_file = f"/Workspace/Repos/{current_user_id}/tfnsw_bootcamp/gtfs-realtime_1007_extension.desc"
+
+descriptor_file = "/FileStore/tmp/transport_bootcamp/desc/gtfs-realtime_1007_extension.desc"
+
+dbutils.fs.cp("file:"+source_descriptor_file, "dbfs:" +descriptor_file)
 
 # COMMAND ----------
 
