@@ -10,6 +10,11 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC We are going to import a custom json config file for our catalog, you can then reuse this code for each catalog a team creates. See file `config.json`
+
+# COMMAND ----------
+
 # creating the file
 catalog_documentation = [
     {
@@ -52,32 +57,115 @@ catalog_documentation = [
 
 # COMMAND ----------
 
-# parsing the file to add documentation and constraints
+class Table:
+    def __init__(self, table_name, table_comment, column_comments, table_constraints):
+        self.table_name = table_name
+        self.table_comment = table_comment
+        self.column_comments = column_comments
+        self.table_constraints = table_constraints
 
-# get and set catalog
-for catalog_docs in catalog_documentation:
-    catalog = catalog_docs.get('catalog_name')
-    catalog_comment = catalog_docs.get('catalog_comment')
-    spark.sql(f'USE CATALOG {catalog}')
-    spark.sql(f'COMMENT ON CATALOG {catalog} IS "{catalog_comment}";')
+    def set_comments_and_constraints(self):
+        # Set table comment
+        spark.sql(f'COMMENT ON TABLE {self.table_name} IS "{self.table_comment}";')
 
-    # get and set schema
-    for schema_docs in catalog_docs.get("schema_documentation"):
-        schema = schema_docs.get("schema_name")
-        schema_comment = schema_docs.get("schema_comment")
-        spark.sql(f'USE SCHEMA {schema}')
-        spark.sql(f'COMMENT ON SCHEMA {schema} IS "{schema_comment}";')
-    
-    # get table
-    for table_docs in schema_docs.get("table_documentation"):
-        table = table_docs.get("table_name")
-        table_comment = table_docs.get("table_comment")
-        spark.sql(f'COMMENT ON TABLE {table} IS "{table_comment}";')
-        for column, comment in table_docs.get("column_comments").items():
-          spark.sql(f'ALTER TABLE {table} ALTER COLUMN {column} COMMENT "{comment}"')
-        for constraint in table_docs.get("table_constraints"):
-          spark.sql(f'ALTER TABLE {table} ADD CONSTRAINT {constraint}')
+        # Set column comments
+        for column, comment in self.column_comments.items():
+            spark.sql(f'ALTER TABLE {self.table_name} ALTER COLUMN {column} COMMENT "{comment}"')
 
+        # Set table constraints
+        for constraint in self.table_constraints:
+            spark.sql(f'ALTER TABLE {self.table_name} ADD CONSTRAINT {constraint}')
+
+class Schema:
+    def __init__(self, schema_name, schema_comment):
+        self.schema_name = schema_name
+        self.schema_comment = schema_comment
+        self.tables = []
+
+    def add_table(self, table):
+        self.tables.append(table)
+
+    def set_comments_and_constraints(self):
+        # Set schema comment
+        spark.sql(f'USE SCHEMA {self.schema_name}')
+        spark.sql(f'COMMENT ON SCHEMA {self.schema_name} IS "{self.schema_comment}";')
+
+        # Set comments and constraints for each table
+        for table in self.tables:
+            table.set_comments_and_constraints()
+
+class Catalog:
+    def __init__(self, catalog_name, catalog_comment):
+        self.catalog_name = catalog_name
+        self.catalog_comment = catalog_comment
+        self.schemas = []
+
+    def add_schema(self, schema):
+        self.schemas.append(schema)
+
+    def set_comments_and_constraints(self):
+        # Set catalog comment
+        spark.sql(f'USE CATALOG {self.catalog_name}')
+        spark.sql(f'COMMENT ON CATALOG {self.catalog_name} IS "{self.catalog_comment}";')
+
+        # Set comments and constraints for each schema
+        for schema in self.schemas:
+            schema.set_comments_and_constraints()
+
+# COMMAND ----------
+
+import json
+
+# Read the JSON config file
+def read_config_file(file_path):
+    with open(file_path, 'r') as file:
+        config_data = json.load(file)
+    return config_data
+
+# Create instances of Table, Schema, and Catalog classes
+def create_instances_from_config(config_data):
+    catalogs = config_data.get("catalogs", [])
+    all_catalogs = []
+
+    for catalog_data in catalogs:
+        catalog_name = catalog_data.get("catalog_name")
+        catalog_comment = catalog_data.get("catalog_comment")
+        catalog = Catalog(catalog_name, catalog_comment)
+
+        schemas = catalog_data.get("schemas", [])
+        for schema_data in schemas:
+            schema_name = schema_data.get("schema_name")
+            schema_comment = schema_data.get("schema_comment")
+            schema = Schema(schema_name, schema_comment)
+
+            tables = schema_data.get("tables", [])
+            for table_data in tables:
+                table_name = table_data.get("table_name")
+                table_comment = table_data.get("table_comment")
+                column_comments = table_data.get("column_comments", {})
+                table_constraints = table_data.get("table_constraints", [])
+                table = Table(table_name, table_comment, column_comments, table_constraints)
+                schema.add_table(table)
+
+            catalog.add_schema(schema)
+
+        all_catalogs.append(catalog)
+
+    return all_catalogs
+
+# Function to apply the documentation and constraints using the Catalog class
+def add_documentation_and_constraints_from_config(config_data):
+    catalogs = create_instances_from_config(config_data)
+    for catalog in catalogs:
+        catalog.set_comments_and_constraints()
+
+
+# COMMAND ----------
+
+# Example usage
+config_file_path = "/Workspace/Repos/odl_instructor_580356@databrickslabs.com/tfnsw_bootcamp/Lisa/documentation_config.json"
+config_data = read_config_file(config_file_path)
+add_documentation_and_constraints_from_config(config_data)
 
 # COMMAND ----------
 
