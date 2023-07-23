@@ -4,11 +4,25 @@
 
 # COMMAND ----------
 
+UC_enabled = False
+reset = True
+
+# COMMAND ----------
+
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/refresh-env
+dbutils.widgets.text('database', database)
+dbutils.widgets.text('bronze_table', bronze_table_name)
+dbutils.widgets.text('silver_table', silver_table_name)
+dbutils.widgets.text('gold_table', gold_table_name)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Start
+# MAGIC ##Make sure you ran SETUP first
 
 # COMMAND ----------
 
@@ -72,19 +86,18 @@ df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_n
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC delete  from transport_bootcamp.yas_mokri_bootcamp.bronze_train_data
-
-# COMMAND ----------
-
 display(api_data)
 display(df)
 
 # COMMAND ----------
 
-bronze_df = spark.read.table("transport_bootcamp.yas_mokri_bootcamp.bronze_train_data")
+bronze_df = spark.read.table(bronze_table_name)
 
 # COMMAND ----------
 
 # MAGIC %sql 
-# MAGIC select * from transport_bootcamp.yas_mokri_bootcamp.bronze_train_data
+# MAGIC select * from $bronze_table
+
+# COMMAND ----------
+
+dbutils.widgets.removeAll()

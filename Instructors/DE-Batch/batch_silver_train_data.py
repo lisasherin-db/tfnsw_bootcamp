@@ -1,11 +1,28 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC ##SETUP
+
+# COMMAND ----------
+
+UC_enabled = False
+reset = False
+
+# COMMAND ----------
+
 # MAGIC %run ../utils/setup
 
 # COMMAND ----------
 
-print (f"database :  {database}") 
-print(f"bronze table name: {bronze_table_name}")
-print(f"silver table name: {silver_table_name}")
+dbutils.widgets.text('database', database)
+dbutils.widgets.text('bronze_table', bronze_table_name)
+dbutils.widgets.text('silver_table', silver_table_name)
+dbutils.widgets.text('gold_table', gold_table_name)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Start
+# MAGIC ##Make sure you ran SETUP first
 
 # COMMAND ----------
 
@@ -45,7 +62,7 @@ proto_df.schema
 
 unpacked_df = proto_df.select('ingest_time', 'proto.*').select('ingest_time', explode(col('entity')).alias("entity"))
 
-# hand on exercise- continue by unpacking some more fields like entity then vehicle, use a pattern similar proto_df.select('proto.*')
+# hands on exercise- continue by unpacking some more fields like entity then vehicle, use a pattern similar proto_df.select('proto.*')
 unpacked_df = unpacked_df.select('ingest_time', "entity", "entity.*").select('ingest_time', "entity", "id", "alert","vehicle.*")
 
 display(unpacked_df)
@@ -89,10 +106,10 @@ unpacked_df.write.mode('append').option("mergeSchema", "true").saveAsTable(silve
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT id, congestion_level FROM transport_bootcamp.yas_mokri_bootcamp.silver_train_data WHERE id in (1,2,10);
+# MAGIC SELECT id, congestion_level FROM $silver_table WHERE id in (1,2,10);
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC UPDATE transport_bootcamp.yas_mokri_bootcamp.silver_train_data SET congestion_level="VERY_KNOWN_CONGESTION_LEVEL" WHERE id in (1,2,10) ;
-# MAGIC SELECT id, congestion_level FROM transport_bootcamp.yas_mokri_bootcamp.silver_train_data WHERE id in (1,2,10);
+# MAGIC UPDATE $silver_table SET congestion_level="VERY_KNOWN_CONGESTION_LEVEL" WHERE id in (1,2,10) ;
+# MAGIC SELECT id, congestion_level FROM $silver_table WHERE id in (1,2,10);

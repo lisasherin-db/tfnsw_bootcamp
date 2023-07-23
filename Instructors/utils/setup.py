@@ -7,9 +7,14 @@ database_name = current_user_id.split('@')[0].replace('.','_')+'_bootcamp'
 
 # COMMAND ----------
 
-database = f"{catalog_name}.{database_name}"
+if UC_enabled:
+  database = f"{catalog_name}.{database_name}"
+else:
+  database = f"{database_name}"
+  
 bronze_table_name = f"{database}.bronze_train_data"
 silver_table_name = f"{database}.silver_train_data"
+gold_table_name = f"{database}.gold_train_data"
 
 # COMMAND ----------
 
@@ -22,3 +27,18 @@ descriptor_file = "/Workspace/Repos/yas.mokri@databricks.com/tfnsw_bootcamp/gtfs
 # COMMAND ----------
 
 scope_name = "lisasherin"
+
+# COMMAND ----------
+
+if reset:
+  dbutils.fs.rm(datasets_location, True)
+
+  UC_enabled = False
+  if UC_enabled:
+    spark.sql(f'CREATE CATALOG IF NOT EXISTS {catalog_name}')
+
+  spark.sql(f'create database if not exists {database};')
+  spark.sql(f'use {database}')
+
+  print (f"Created database :  {database}") 
+
