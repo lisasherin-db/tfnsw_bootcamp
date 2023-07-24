@@ -13,13 +13,6 @@ reset = False
 
 # COMMAND ----------
 
-dbutils.widgets.text('database', database)
-dbutils.widgets.text('bronze_table', bronze_table_name)
-dbutils.widgets.text('silver_table', silver_table_name)
-dbutils.widgets.text('gold_table', gold_table_name)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ## Start
 # MAGIC ##Make sure you ran SETUP first
@@ -63,7 +56,7 @@ proto_df.schema
 unpacked_df = proto_df.select('ingest_time', 'proto.*').select('ingest_time', explode(col('entity')).alias("entity"))
 
 # hands on exercise- continue by unpacking some more fields like entity then vehicle, use a pattern similar proto_df.select('proto.*')
-unpacked_df = unpacked_df.select('ingest_time', "entity", "entity.*").select('ingest_time', "entity", "id", "alert","vehicle.*")
+unpacked_df = unpacked_df.select('ingest_time', "entity", "entity.*")
 
 display(unpacked_df)
 
@@ -75,6 +68,13 @@ display(unpacked_df)
 # COMMAND ----------
 
 proto_df.createOrReplaceTempView("proto_temp_view")
+
+# COMMAND ----------
+
+dbutils.widgets.text('database', database)
+dbutils.widgets.text('bronze_table', bronze_table_name)
+dbutils.widgets.text('silver_table', silver_table_name)
+dbutils.widgets.text('gold_table', gold_table_name)
 
 # COMMAND ----------
 
@@ -113,3 +113,49 @@ unpacked_df.write.mode('append').option("mergeSchema", "true").saveAsTable(silve
 # MAGIC %sql
 # MAGIC UPDATE $silver_table SET congestion_level="VERY_KNOWN_CONGESTION_LEVEL" WHERE id in (1,2,10) ;
 # MAGIC SELECT id, congestion_level FROM $silver_table WHERE id in (1,2,10);
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##Schema Evolution
+# MAGIC
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * from $silver_table
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###Unpack one more field and Append to Silver Table
+
+# COMMAND ----------
+
+unpacked_df = unpacked_df.select('ingest_time', "entity", "id", "alert","vehicle.*")
+display(unpacked_df)
+
+# COMMAND ----------
+
+unpacked_df.write.mode('append').option("mergeSchema", "true").saveAsTable(silver_table_name)
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Check that table now has the extra columns for the new rows added
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * from $silver_table WHERE stop_id IS NOT NULL
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Without reprocessing the existing data
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * from $silver_table WHERE stop_id IS  NULL
