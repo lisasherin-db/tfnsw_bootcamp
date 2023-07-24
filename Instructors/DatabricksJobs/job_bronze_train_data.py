@@ -13,6 +13,10 @@ reset = True
 
 # COMMAND ----------
 
+bronze_table_name = "job_" + bronze_table_name
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ## Start
 # MAGIC ##Make sure you ran SETUP first
@@ -68,42 +72,3 @@ df = spark.createDataFrame(data=data)
 df.write.mode('append').option("mergeSchema", "true").saveAsTable(bronze_table_name)
 # time.sleep(sleep_time)
 
-
-# COMMAND ----------
-
-# MAGIC %md 
-# MAGIC let's write some code to explore api_data and the delta table 
-# MAGIC - in python you can use display()
-# MAGIC - you can switch to SQL by adding %sql 
-# MAGIC - to read a delta table into a dataframe you can use this syntax: spark.read.table(table_name)
-
-# COMMAND ----------
-
-display(api_data)
-display(df)
-
-# COMMAND ----------
-
-bronze_df = spark.read.table(bronze_table_name)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ##using the widgets to pass paramters to the SQL queries
-# MAGIC There are other ways that we'll see later
-
-# COMMAND ----------
-
-dbutils.widgets.text('database', database)
-dbutils.widgets.text('bronze_table', bronze_table_name)
-dbutils.widgets.text('silver_table', silver_table_name)
-dbutils.widgets.text('gold_table', gold_table_name)
-
-# COMMAND ----------
-
-# MAGIC %sql 
-# MAGIC select * from $bronze_table
-
-# COMMAND ----------
-
-dbutils.widgets.removeAll()
