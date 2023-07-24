@@ -13,7 +13,7 @@ reset = True
 
 # COMMAND ----------
 
-bronze_table_name = "job_" + bronze_table_name
+bronze_table_name = bronze_table_name + "_job"
 
 # COMMAND ----------
 

@@ -13,7 +13,8 @@ reset = False
 
 # COMMAND ----------
 
-gold_table_name = "job_" + gold_table_name
+silver_table_name = silver_table_name+ "_job"
+gold_table_name = gold_table_name+ "_job"
 
 # COMMAND ----------
 

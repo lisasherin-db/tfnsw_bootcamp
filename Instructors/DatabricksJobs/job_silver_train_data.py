@@ -13,8 +13,8 @@ reset = False
 
 # COMMAND ----------
 
-bronze_table_name = "job_" + bronze_table_name
-silver_table_name = "job_" + silver_table_name
+bronze_table_name = bronze_table_name + "_job"
+silver_table_name = silver_table_name+ "_job"
 
 # COMMAND ----------
 

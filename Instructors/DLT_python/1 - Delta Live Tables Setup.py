@@ -31,7 +31,7 @@ reset = True
 
 storage_location = f'{datasets_location}dlt_pipeline'
 pipline_name = f"{database_name}_train_data_pipeline"
-notebook_path = f"/Repos/{current_user_id}/tfnsw_bootcamp/Instructors/DLT_python/dlt_bronze_python"
+notebook_path = f"/Repos/{current_user_id}/tfnsw_bootcamp/Instructors/DLT_python/dlt_bronze_silver_python"
 input_path = f"{datasets_location}dlt_apidata/"
 cluster_mode = "Fixed size"
 workers = 2

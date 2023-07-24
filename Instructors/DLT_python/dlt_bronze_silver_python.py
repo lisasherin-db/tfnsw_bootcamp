@@ -58,6 +58,22 @@ def dlt_silver():
 
 # COMMAND ----------
 
+
+dlt.create_target_table(
+  name="dlt_silver_scd",
+  table_properties = {"caseSensitive" : "true", "delta.enableChangeDataFeed": "true"}
+)
+
+dlt.apply_changes(
+  target = "dlt_silver_scd",
+  source = "bronze_view",
+  keys = ["id"],
+  sequence_by = "ingest_time", # or a btter timestamp
+  stored_as_scd_type = 1
+)
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ## Let's do this in SQL (open the gold notebook from the repo with SQL as the language)
 # MAGIC
