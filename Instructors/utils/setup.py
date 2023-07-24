@@ -28,9 +28,11 @@ descriptor_file = "/FileStore/tmp/transport_bootcamp/desc/gtfs-realtime_1007_ext
 
 dbutils.fs.cp("file:"+source_descriptor_file, "dbfs:" +descriptor_file)
 
+descriptor_file = '/dbfs'+descriptor_file
+
 # COMMAND ----------
 
-scope_name = "lisasherin"
+scope_name = "tfnsw_bootcamp"
 
 # COMMAND ----------
 
